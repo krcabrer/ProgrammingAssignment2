@@ -7,18 +7,18 @@
 
 
 # This function creates a special type of matrix
-# that stores a cached inverse, so do not calculate every time is needed.
+# that stores a cached inverse, so do not calculate every time it is needed.
 makeCacheMatrix <- function(x = matrix()) {
-  inv <- NULL
-  set <- function(y) {
-    x <<- y
-    inv <<- NULL
+  inv <- NULL                               # Set the inverse NULL for a new matrix
+  set <- function(y) {                      # Creates a function that set a matrix in x
+    x <<- y                                 # Use this in case you want to change the 
+    inv <<- NULL                            # matrix in futher use.
   }
-  get <- function() as.matrix(x)
-  setinv <- function(inverse) inv <<- inverse
-  getinv <- function() inv
-  list(set = set, get = get,
-       setinv = setinv,
+  get <- function() as.matrix(x)            # Creates a function that gets the stored matrix
+  setinv <- function(inverse) inv <<- inverse # Creates a function that set the inverse to the "inv" cache
+  getinv <- function() inv                  # Creates a function that gets the inverse from "inv"
+  list(set = set, get = get,                # Retuns a list of functions with the
+       setinv = setinv,                     # data of the matrix in "x".
        getinv = getinv)
   }
 
@@ -28,14 +28,17 @@ makeCacheMatrix <- function(x = matrix()) {
 ## but if there is a previous inverse just use it.
 
 cacheSolve <- function(x, ...) {
-    inv <- x$getinv()
-    if(!is.null(inv)) {
-      message("getting cached inv matrix")
+    inv <- x$getinv()                       # Stores the inverse to the "inv" local variable
+                                            # calling the getinv() internal function of the
+                                            # special matrix
+    if(!is.null(inv)) {                     # If it is already stored then returns the                                   
+      message("getting cached inv matrix")  # already calculated inverse of the matrix.
       return(inv)
     }
-    data <- x$get()
-    inv <- solve(data, ...)
-    x$setinv(inv)
-    inv
-  }        ## Return a matrix that is the inverse of 'x'
+    data <- x$get()                         # If inv is NULL then retrive the data
+                                            # with the function get()
+    inv <- solve(data, ...)                 # Then calculate the inverse
+    x$setinv(inv)                           # stores in the inv as cache for futher use.
+    inv                                     # Then return the inv variable
+  }        
 
